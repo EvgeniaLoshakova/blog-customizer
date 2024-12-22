@@ -22,6 +22,7 @@ import {
 } from 'src/constants/articleProps';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
+
 type FormProps = { onChange: (styles: ArticleStyles) => void };
 type ArticleStyles = CSSProperties & {
 	'--font-family'?: string;
@@ -32,7 +33,7 @@ type ArticleStyles = CSSProperties & {
 };
 
 export const ArticleParamsForm = ({ onChange }: FormProps) => {
-	const [isOpen, setIsOpen] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [fontFamily, setFontFamily] = useState<OptionType>(
 		defaultArticleState.fontFamilyOption
 	);
@@ -78,32 +79,35 @@ export const ArticleParamsForm = ({ onChange }: FormProps) => {
 
 	const sidebarRef = useRef<HTMLElement | null>(null);
 
-	function closeSidebar(event: MouseEvent) {
-		if (
-			sidebarRef.current &&
-			!sidebarRef.current.contains(event.target as Node)
-		) {
-			setIsOpen(false);
-		}
-	}
-
 	useEffect(() => {
-		if (isOpen) {
+		function closeSidebar(event: MouseEvent) {
+			if (
+				sidebarRef.current &&
+				!sidebarRef.current.contains(event.target as Node)
+			) {
+				setIsMenuOpen(false);
+			}
+		}
+
+		if (isMenuOpen) {
 			document.addEventListener('mousedown', closeSidebar);
-		} else {
-			document.removeEventListener('mousedown', closeSidebar);
 		}
 		return () => {
 			document.removeEventListener('mousedown', closeSidebar);
 		};
-	}, [isOpen]);
+	}, [isMenuOpen]);
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClickSidebar={() => setIsOpen(!isOpen)} />
+			<ArrowButton
+				isOpen={isMenuOpen}
+				onClickSidebar={() => setIsMenuOpen(!isMenuOpen)}
+			/>
 			<aside
 				ref={sidebarRef}
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+				className={clsx(styles.container, {
+					[styles.container_open]: isMenuOpen,
+				})}>
 				<form className={styles.form} onSubmit={applyParams}>
 					<Text as={'h2'} weight={800} size={31}>
 						ЗАДАЙТЕ ПАРАМЕТРЫ
